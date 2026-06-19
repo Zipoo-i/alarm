@@ -10,7 +10,6 @@ int main(int argc, char *argv[]) {
     }
     int id = atoi(argv[1]);
 
-    // Логирование для отладки
     FILE *log = fopen("trigger_log.txt", "a");
     if (log) {
         time_t now = time(NULL);
@@ -29,11 +28,11 @@ int main(int argc, char *argv[]) {
         db_close(db);
         return 1;
     }
-    // Сохраняем данные для последующего удаления
+
     int is_recurring = a.is_recurring;
     char task_name[64];
     strcpy(task_name, a.task_name);
-    db_close(db); // закрываем, потом откроем для удаления
+    db_close(db); 
 
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
@@ -61,11 +60,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Если будильник одноразовый, удаляем его
     if (!is_recurring) {
         db = db_open();
         if (db) {
-            // Удаляем запись из БД
             sqlite3_stmt *stmt;
             const char *sql = "DELETE FROM alarms WHERE id = ?";
             int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
@@ -75,7 +72,6 @@ int main(int argc, char *argv[]) {
                 sqlite3_finalize(stmt);
             }
             db_close(db);
-            // Удаляем задачу из планировщика
             scheduler_delete_task(task_name);
             printf("One-time alarm (ID %d) deleted.\n", id);
         }

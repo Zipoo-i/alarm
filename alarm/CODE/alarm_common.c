@@ -169,13 +169,13 @@ void adjust_date_for_today(char *date_str, const char *time_str) {
         mktime(tm_now);
     }
 
-    // Формат DD.MM.YYYY (принимается русской локалью)
+
     strftime(date_str, 12, "%d.%m.%Y", tm_now);
 }
 
 int scheduler_create_task(const Alarm *a) {
     char cmd[2048];
-    char date_str[12]; // достаточно для "MM/DD/YYYY\0"
+    char date_str[12];
     char exe_path[MAX_PATH];
     char trigger_full_path[MAX_PATH + 20];
 
@@ -183,7 +183,7 @@ int scheduler_create_task(const Alarm *a) {
     char *last_slash = strrchr(exe_path, '\\');
     if (last_slash) *(last_slash + 1) = '\0';
 
-    // Весь путь с аргументом в одних кавычках
+
     snprintf(trigger_full_path, sizeof(trigger_full_path), "\"%strigger.exe %d\"", exe_path, a->id);
 
     if (a->is_recurring) {
@@ -196,7 +196,7 @@ int scheduler_create_task(const Alarm *a) {
                  "%s /create /tn \"%s\" /tr %s /sc once /st %s /sd %s /f",
                  SCHTASKS_CMD, a->task_name, trigger_full_path, a->time, date_str);
     }
-    printf("Executing: %s\n", cmd); // для отладки
+    printf("Executing: %s\n", cmd); 
     int ret = system(cmd);
     if (ret != 0) {
         fprintf(stderr, "Failed to create scheduled task (return code %d): %s\n", ret, cmd);
